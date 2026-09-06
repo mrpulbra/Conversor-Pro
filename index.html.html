@@ -1,0 +1,974 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="apple-mobile-web-app-title" content="Conversor PRO">
+    <link rel="apple-touch-icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>💎</text></svg>">
+    <title>Conversor PRO</title>
+    <style>
+        /* ============================================
+                   VARIÁVEIS GLOBAIS
+                   ============================================ */
+        :root {
+            --bg: #f0f4f8;
+            --card: #ffffff;
+            --text: #1a1a2e;
+            --subtext: #6b7280;
+            --border: #e5e7eb;
+            --input-bg: #f9fafb;
+            --shadow: 0 20px 60px rgba(0, 0, 0, 0.06);
+            --blue: #4f46e5;
+            --blue-light: #818cf8;
+            --blue-dark: #3730a3;
+            --green: #10b981;
+            --green-dark: #059669;
+            --orange: #f59e0b;
+            --red: #ef4444;
+            --purple: #8b5cf6;
+            --gradient-main: linear-gradient(135deg, #4f46e5 0%, #7c3aed 100%);
+            --gradient-total: linear-gradient(135deg, #4f46e5 0%, #3730a3 100%);
+            --btn-bg: #f3f4f6;
+            --btn-border: #e5e7eb;
+            --btn-text: #1a1a2e;
+            --radius: 20px;
+            --radius-sm: 12px;
+            --font: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+        }
+
+        [data-theme="dark"] {
+            --bg: #0f0f1a;
+            --card: #1a1a2e;
+            --text: #f1f5f9;
+            --subtext: #94a3b8;
+            --border: #2d2d44;
+            --input-bg: #25253d;
+            --shadow: 0 20px 60px rgba(0, 0, 0, 0.4);
+            --btn-bg: #25253d;
+            --btn-border: #2d2d44;
+            --btn-text: #f1f5f9;
+            --gradient-main: linear-gradient(135deg, #4f46e5 0%, #6d28d9 100%);
+            --gradient-total: linear-gradient(135deg, #4f46e5 0%, #3730a3 100%);
+        }
+
+        /* ============================================
+                   RESET E BASE
+                   ============================================ */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: var(--font);
+            transition: background 0.3s ease, color 0.3s ease, border 0.3s ease, box-shadow 0.3s ease, transform 0.2s ease;
+        }
+
+        body {
+            background: var(--bg);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .card {
+            background: var(--card);
+            max-width: 440px;
+            width: 100%;
+            padding: 28px 24px 30px;
+            border-radius: var(--radius);
+            box-shadow: var(--shadow);
+            border: 1px solid var(--border);
+            position: relative;
+            overflow: hidden;
+        }
+
+        /* ============================================
+                   HEADER
+                   ============================================ */
+        .header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 18px;
+            padding-bottom: 16px;
+            border-bottom: 2px solid var(--border);
+        }
+
+        .header-left {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .header-left .icon {
+            font-size: 28px;
+        }
+
+        .header-left h1 {
+            font-size: 22px;
+            font-weight: 800;
+            color: var(--text);
+            letter-spacing: -0.5px;
+        }
+
+        .header-left h1 span {
+            background: var(--gradient-main);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .badge-pro {
+            background: var(--gradient-main);
+            color: white;
+            font-size: 9px;
+            font-weight: 700;
+            padding: 2px 10px;
+            border-radius: 30px;
+            letter-spacing: 0.8px;
+            text-transform: uppercase;
+            margin-left: 4px;
+            -webkit-text-fill-color: white;
+        }
+
+        .header-actions {
+            display: flex;
+            gap: 6px;
+            align-items: center;
+        }
+
+        .btn-icon {
+            background: var(--input-bg);
+            border: 1.5px solid var(--border);
+            border-radius: 50%;
+            width: 40px;
+            height: 40px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 17px;
+            cursor: pointer;
+            color: var(--text);
+            transition: all 0.2s;
+        }
+
+        .btn-icon:hover {
+            border-color: var(--blue);
+            background: var(--blue);
+            color: white;
+            transform: scale(1.05);
+        }
+
+        .btn-icon:active {
+            transform: scale(0.92);
+        }
+
+        .btn-icon.carregando {
+            animation: girar 0.8s linear infinite;
+        }
+
+        @keyframes girar {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        /* ============================================
+                   SUBHEADER
+                   ============================================ */
+        .sub {
+            color: var(--subtext);
+            font-size: 13px;
+            margin-bottom: 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .cotacao-info {
+            background: var(--input-bg);
+            padding: 5px 16px;
+            border-radius: 30px;
+            font-weight: 700;
+            color: var(--text);
+            border: 1px solid var(--border);
+            font-size: 14px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .cotacao-info .atualizado-em {
+            font-weight: 400;
+            color: var(--subtext);
+            font-size: 10px;
+        }
+
+        .cotacao-info .moeda {
+            font-size: 16px;
+        }
+
+        /* ============================================
+                   CAMPOS
+                   ============================================ */
+        .campo {
+            margin-bottom: 16px;
+        }
+
+        .campo label {
+            display: flex;
+            justify-content: space-between;
+            font-size: 12px;
+            font-weight: 600;
+            color: var(--text);
+            margin-bottom: 5px;
+            letter-spacing: 0.3px;
+        }
+
+        .campo label span {
+            font-weight: 400;
+            color: var(--subtext);
+            font-size: 11px;
+        }
+
+        .campo input {
+            width: 100%;
+            padding: 14px 16px;
+            font-size: 17px;
+            border: 2px solid var(--border);
+            border-radius: var(--radius-sm);
+            background: var(--input-bg);
+            outline: none;
+            transition: all 0.25s;
+            font-weight: 600;
+            color: var(--text);
+        }
+
+        .campo input:focus {
+            border-color: var(--blue);
+            background: var(--card);
+            box-shadow: 0 0 0 4px rgba(79, 70, 229, 0.08);
+        }
+
+        .campo input::-webkit-outer-spin-button,
+        .campo input::-webkit-inner-spin-button {
+            -webkit-appearance: none;
+            margin: 0;
+        }
+
+        .campo input[type=number] {
+            -moz-appearance: textfield;
+        }
+
+        /* ============================================
+                   BOTÕES RÁPIDOS
+                   ============================================ */
+        .btn-group {
+            display: flex;
+            gap: 6px;
+            margin-top: 8px;
+            flex-wrap: wrap;
+        }
+
+        .btn-group .btn {
+            flex: 1;
+            min-width: 38px;
+            padding: 7px 4px;
+            border: 2px solid var(--border);
+            border-radius: var(--radius-sm);
+            background: var(--btn-bg);
+            font-size: 11px;
+            font-weight: 700;
+            color: var(--btn-text);
+            cursor: pointer;
+            transition: all 0.2s;
+            text-align: center;
+            letter-spacing: 0.3px;
+        }
+
+        .btn-group .btn:hover {
+            border-color: var(--blue);
+            transform: translateY(-1px);
+        }
+
+        .btn-group .btn:active {
+            transform: scale(0.94);
+        }
+
+        .btn-group .btn.active-frete {
+            background: var(--blue);
+            color: white;
+            border-color: var(--blue);
+            box-shadow: 0 4px 14px rgba(79, 70, 229, 0.3);
+        }
+
+        .btn-group .btn.active-ganho {
+            background: var(--green);
+            color: white;
+            border-color: var(--green);
+            box-shadow: 0 4px 14px rgba(16, 185, 129, 0.3);
+        }
+
+        /* ============================================
+                   BOTÃO ZERAR
+                   ============================================ */
+        .btn-zerar {
+            width: 100%;
+            padding: 13px;
+            margin-top: 4px;
+            margin-bottom: 12px;
+            border: 2px solid var(--border);
+            border-radius: var(--radius-sm);
+            background: var(--input-bg);
+            color: var(--subtext);
+            font-size: 14px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.25s;
+            letter-spacing: 0.3px;
+        }
+
+        .btn-zerar:hover {
+            border-color: var(--red);
+            color: var(--red);
+            background: rgba(239, 68, 68, 0.04);
+        }
+
+        .btn-zerar:active {
+            transform: scale(0.97);
+            background: var(--red);
+            color: white;
+        }
+
+        /* ============================================
+                   RESUMO CUSTO
+                   ============================================ */
+        .resumo-custo {
+            background: var(--input-bg);
+            border-radius: var(--radius-sm);
+            padding: 16px 18px;
+            margin: 14px 0 14px;
+            border: 1.5px solid var(--border);
+        }
+
+        .resumo-custo .titulo {
+            font-size: 11px;
+            font-weight: 700;
+            color: var(--subtext);
+            text-transform: uppercase;
+            letter-spacing: 0.8px;
+            margin-bottom: 10px;
+        }
+
+        .resumo-custo .linha {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 5px 0;
+            border-bottom: 1px solid rgba(128, 128, 128, 0.05);
+        }
+
+        .resumo-custo .linha:last-child {
+            border-bottom: none;
+        }
+
+        .resumo-custo .linha .label {
+            font-size: 13px;
+            color: var(--subtext);
+            font-weight: 500;
+        }
+
+        .resumo-custo .linha .valor {
+            font-size: 15px;
+            font-weight: 700;
+        }
+
+        .resumo-custo .linha .valor.usd {
+            color: var(--blue);
+        }
+
+        .resumo-custo .linha .valor.brl-destaque {
+            color: var(--orange);
+            font-size: 17px;
+        }
+
+        /* ============================================
+                   DETALHES
+                   ============================================ */
+        .detalhes {
+            background: var(--input-bg);
+            border-radius: var(--radius-sm);
+            padding: 14px 16px;
+            margin: 14px 0 14px;
+            border: 1.5px solid var(--border);
+        }
+
+        .detalhe-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 5px 0;
+            border-bottom: 1px solid rgba(128, 128, 128, 0.05);
+        }
+
+        .detalhe-item:last-child {
+            border-bottom: none;
+        }
+
+        .detalhe-item .label {
+            font-size: 12px;
+            color: var(--subtext);
+            font-weight: 500;
+        }
+
+        .detalhe-item .valores {
+            display: flex;
+            gap: 14px;
+            font-size: 13px;
+            font-weight: 600;
+        }
+
+        .detalhe-item .valores .usd {
+            color: var(--blue);
+        }
+
+        .detalhe-item .valores .brl {
+            color: var(--green);
+        }
+
+        .detalhe-item .valores .brl::before {
+            content: "R$ ";
+            font-weight: 400;
+            color: var(--subtext);
+        }
+
+        .detalhe-item .valores .usd::before {
+            content: "US$ ";
+            font-weight: 400;
+            color: var(--subtext);
+        }
+
+        /* ============================================
+                   TOTAL (PREÇO DE VENDA)
+                   ============================================ */
+        .detalhe-total {
+            background: var(--gradient-total);
+            border-radius: var(--radius-sm);
+            padding: 18px 22px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            box-shadow: 0 8px 30px rgba(79, 70, 229, 0.25);
+        }
+
+        .detalhe-total .label-total {
+            color: rgba(255, 255, 255, 0.85);
+            font-size: 13px;
+            font-weight: 600;
+            letter-spacing: 0.3px;
+        }
+
+        .detalhe-total .valores-total {
+            display: flex;
+            gap: 18px;
+            font-size: 16px;
+            font-weight: 700;
+            color: white;
+        }
+
+        .detalhe-total .valores-total .usd-total {
+            color: rgba(255, 255, 255, 0.6);
+            font-size: 14px;
+        }
+
+        .detalhe-total .valores-total .brl-total {
+            font-size: 19px;
+            letter-spacing: -0.3px;
+        }
+
+        /* ============================================
+                   LUCRO
+                   ============================================ */
+        .lucro-box {
+            background: var(--input-bg);
+            border-radius: var(--radius-sm);
+            padding: 14px 18px;
+            margin-top: 12px;
+            border: 2px solid var(--green);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            transition: border-color 0.3s;
+        }
+
+        .lucro-box .label-lucro {
+            font-size: 13px;
+            font-weight: 600;
+            color: var(--text);
+        }
+
+        .lucro-box .valor-lucro {
+            font-size: 19px;
+            font-weight: 800;
+            color: var(--green);
+        }
+
+        .lucro-box .valor-lucro.negativo {
+            color: var(--red);
+        }
+
+        .lucro-box.negativo {
+            border-color: var(--red);
+        }
+
+        /* ============================================
+                   FOOTER
+                   ============================================ */
+        .footer {
+            text-align: center;
+            font-size: 10px;
+            color: var(--subtext);
+            margin-top: 18px;
+            letter-spacing: 0.5px;
+            display: flex;
+            justify-content: center;
+            gap: 12px;
+            flex-wrap: wrap;
+        }
+
+        .footer span {
+            background: var(--input-bg);
+            padding: 3px 12px;
+            border-radius: 20px;
+            border: 1px solid var(--border);
+            font-weight: 500;
+        }
+
+        /* ============================================
+                   TOAST
+                   ============================================ */
+        .toast {
+            position: fixed;
+            bottom: 30px;
+            left: 50%;
+            transform: translateX(-50%) translateY(20px);
+            background: rgba(0, 0, 0, 0.85);
+            color: white;
+            padding: 12px 28px;
+            border-radius: 30px;
+            font-size: 13px;
+            font-weight: 600;
+            opacity: 0;
+            transition: opacity 0.4s ease, transform 0.4s ease;
+            pointer-events: none;
+            backdrop-filter: blur(12px);
+            box-shadow: 0 8px 30px rgba(0, 0, 0, 0.2);
+            z-index: 999;
+        }
+
+        .toast.show {
+            opacity: 1;
+            transform: translateX(-50%) translateY(0);
+        }
+
+        /* ============================================
+                   RESPONSIVO
+                   ============================================ */
+        @media (max-width: 440px) {
+            .card { padding: 20px 16px 22px; }
+            .header-left h1 { font-size: 19px; }
+            .detalhe-total .valores-total { font-size: 14px; gap: 12px; }
+            .detalhe-total .valores-total .brl-total { font-size: 17px; }
+            .detalhe-item .valores { font-size: 11px; gap: 10px; }
+            .btn-group .btn { font-size: 10px; padding: 6px 2px; min-width: 30px; }
+            .resumo-custo .linha .valor { font-size: 13px; }
+            .resumo-custo .linha .valor.brl-destaque { font-size: 15px; }
+            .lucro-box .valor-lucro { font-size: 17px; }
+            .btn-zerar { font-size: 13px; padding: 11px; }
+            .btn-icon { width: 36px; height: 36px; font-size: 15px; }
+            .cotacao-info { font-size: 12px; padding: 4px 12px; }
+        }
+
+        @media (max-width: 380px) {
+            .card { padding: 16px 12px 18px; }
+            .header-left h1 { font-size: 16px; }
+            .badge-pro { font-size: 7px; padding: 1px 8px; }
+            .detalhe-total .valores-total { font-size: 12px; gap: 8px; }
+            .detalhe-total .valores-total .brl-total { font-size: 14px; }
+        }
+    </style>
+</head>
+<body>
+
+    <div class="card">
+
+        <!-- ===== HEADER ===== -->
+        <div class="header">
+            <div class="header-left">
+                <span class="icon">💎</span>
+                <h1>Conversor <span>PRO</span></h1>
+                <span class="badge-pro">v2.0</span>
+            </div>
+            <div class="header-actions">
+                <button class="btn-icon" id="atualizarCotacao" title="Atualizar cotação">🔄</button>
+                <button class="btn-icon" id="themeToggle" title="Alternar tema">🌙</button>
+            </div>
+        </div>
+
+        <!-- ===== SUBHEADER ===== -->
+        <div class="sub">
+            <span>Calcule o preço final</span>
+            <span class="cotacao-info">
+                <span class="moeda">💲</span>
+                <span id="cotacaoValor">5,30</span>
+                <span class="atualizado-em" id="atualizadoEm"></span>
+            </span>
+        </div>
+
+        <!-- ===== CAMPOS ===== -->
+        <div class="campo">
+            <label>Valor da compra <span>USD</span></label>
+            <input type="number" id="valor" value="100" step="0.01" placeholder="0,00">
+        </div>
+
+        <div class="campo">
+            <label>Frete <span>%</span></label>
+            <input type="number" id="frete" value="15" step="0.1" placeholder="0">
+            <div class="btn-group" id="freteButtons">
+                <button class="btn" data-frete="10">10%</button>
+                <button class="btn active-frete" data-frete="15">15%</button>
+                <button class="btn" data-frete="20">20%</button>
+                <button class="btn" data-frete="25">25%</button>
+            </div>
+        </div>
+
+        <div class="campo">
+            <label>Seu ganho <span>%</span></label>
+            <input type="number" id="ganho" value="40" step="0.1" placeholder="0">
+            <div class="btn-group" id="ganhoButtons">
+                <button class="btn" data-ganho="10">10%</button>
+                <button class="btn" data-ganho="25">25%</button>
+                <button class="btn" data-ganho="30">30%</button>
+                <button class="btn" data-ganho="35">35%</button>
+                <button class="btn active-ganho" data-ganho="40">40%</button>
+                <button class="btn" data-ganho="45">45%</button>
+                <button class="btn" data-ganho="50">50%</button>
+            </div>
+        </div>
+
+        <div class="campo">
+            <label>Cotação do Dólar <span>BRL</span></label>
+            <input type="number" id="cotacao" value="5.30" step="0.01" placeholder="0,00">
+        </div>
+
+        <!-- ===== BOTÃO ZERAR ===== -->
+        <button class="btn-zerar" id="btnZerar">⟳ Zerar calculadora</button>
+
+        <!-- ===== RESUMO CUSTO ===== -->
+        <div class="resumo-custo">
+            <div class="titulo">📊 Custo total</div>
+            <div class="linha">
+                <span class="label">Compra + Frete</span>
+                <span class="valor usd" id="custoUSD">US$ 115,00</span>
+            </div>
+            <div class="linha">
+                <span class="label">Em Real</span>
+                <span class="valor brl-destaque" id="custoBRL">R$ 609,50</span>
+            </div>
+        </div>
+
+        <!-- ===== DETALHES ===== -->
+        <div class="detalhes">
+            <div class="detalhe-item">
+                <span class="label">💰 Compra</span>
+                <div class="valores">
+                    <span class="usd" id="detalheValorUSD">100,00</span>
+                    <span class="brl" id="detalheValorBRL">530,00</span>
+                </div>
+            </div>
+            <div class="detalhe-item">
+                <span class="label">📦 Frete</span>
+                <div class="valores">
+                    <span class="usd" id="detalheFreteUSD">15,00</span>
+                    <span class="brl" id="detalheFreteBRL">79,50</span>
+                </div>
+            </div>
+            <div class="detalhe-item">
+                <span class="label">📈 Ganho</span>
+                <div class="valores">
+                    <span class="usd" id="detalheGanhoUSD">46,00</span>
+                    <span class="brl" id="detalheGanhoBRL">243,80</span>
+                </div>
+            </div>
+        </div>
+
+        <!-- ===== TOTAL (PREÇO DE VENDA) ===== -->
+        <div class="detalhe-total">
+            <span class="label-total">🎯 Preço de venda</span>
+            <div class="valores-total">
+                <span class="usd-total" id="totalUSD">US$ 161,00</span>
+                <span class="brl-total" id="totalBRL">R$ 853,30</span>
+            </div>
+        </div>
+
+        <!-- ===== LUCRO ===== -->
+        <div class="lucro-box" id="lucroBox">
+            <span class="label-lucro">💰 Seu lucro</span>
+            <span class="valor-lucro" id="lucroValor">R$ 243,80</span>
+        </div>
+
+        <!-- ===== FOOTER ===== -->
+        <div class="footer">
+            <span>⚡ Atualiza automático</span>
+            <span>📱 Cotação ao vivo</span>
+            <span>💎 PRO</span>
+        </div>
+
+    </div>
+
+    <!-- ===== TOAST ===== -->
+    <div class="toast" id="toast">✅ Cotação atualizada!</div>
+
+    <script>
+        // ============================================
+        //  ELEMENTOS
+        // ============================================
+        const valorInput = document.getElementById('valor');
+        const freteInput = document.getElementById('frete');
+        const ganhoInput = document.getElementById('ganho');
+        const cotacaoInput = document.getElementById('cotacao');
+        const freteBtns = document.querySelectorAll('#freteButtons .btn');
+        const ganhoBtns = document.querySelectorAll('#ganhoButtons .btn');
+
+        // ============================================
+        //  VALORES PADRÃO
+        // ============================================
+        const VALOR_PADRAO = 100;
+        const FRETE_PADRAO = 15;
+        const GANHO_PADRAO = 40;
+        const COTACAO_PADRAO = 5.30;
+
+        // ============================================
+        //  FUNÇÃO PRINCIPAL
+        // ============================================
+        function calcular() {
+            const valor = parseFloat(valorInput.value.replace(',', '.')) || 0;
+            const frete = parseFloat(freteInput.value.replace(',', '.')) || 0;
+            const ganho = parseFloat(ganhoInput.value.replace(',', '.')) || 0;
+            const cotacao = parseFloat(cotacaoInput.value.replace(',', '.')) || 0;
+
+            const freteUSD = valor * (frete / 100);
+            const ganhoUSD = (valor + freteUSD) * (ganho / 100);
+            const totalUSD = valor + freteUSD + ganhoUSD;
+            const custoUSD = valor + freteUSD;
+
+            const valorBRL = valor * cotacao;
+            const freteBRL = freteUSD * cotacao;
+            const ganhoBRL = ganhoUSD * cotacao;
+            const totalBRL = totalUSD * cotacao;
+            const custoBRL = custoUSD * cotacao;
+            const lucroBRL = totalBRL - custoBRL;
+
+            const fmt = (n) => n.toFixed(2).replace('.', ',');
+            const fmtUSD = (n) => n.toFixed(2).replace('.', ',');
+
+            // Resumo Custo
+            document.getElementById('custoUSD').textContent = `US$ ${fmtUSD(custoUSD)}`;
+            document.getElementById('custoBRL').textContent = `R$ ${fmt(custoBRL)}`;
+
+            // Detalhes
+            document.getElementById('detalheValorUSD').textContent = fmtUSD(valor);
+            document.getElementById('detalheValorBRL').textContent = fmt(valorBRL);
+            document.getElementById('detalheFreteUSD').textContent = fmtUSD(freteUSD);
+            document.getElementById('detalheFreteBRL').textContent = fmt(freteBRL);
+            document.getElementById('detalheGanhoUSD').textContent = fmtUSD(ganhoUSD);
+            document.getElementById('detalheGanhoBRL').textContent = fmt(ganhoBRL);
+
+            // Total (Preço de Venda)
+            document.getElementById('totalUSD').textContent = `US$ ${fmtUSD(totalUSD)}`;
+            document.getElementById('totalBRL').textContent = `R$ ${fmt(totalBRL)}`;
+
+            // Lucro
+            const lucroEl = document.getElementById('lucroValor');
+            const lucroBox = document.getElementById('lucroBox');
+            lucroEl.textContent = `R$ ${fmt(lucroBRL)}`;
+            
+            if (lucroBRL < 0) {
+                lucroEl.className = 'valor-lucro negativo';
+                lucroBox.className = 'lucro-box negativo';
+            } else {
+                lucroEl.className = 'valor-lucro';
+                lucroBox.className = 'lucro-box';
+            }
+
+            // Cotação no header
+            document.getElementById('cotacaoValor').textContent = fmt(cotacao);
+        }
+
+        // ============================================
+        //  ATUALIZAR BOTÕES
+        // ============================================
+        function atualizarBotoes(botoes, valor, classeAtiva) {
+            botoes.forEach(btn => {
+                const btnValor = parseFloat(btn.dataset.frete || btn.dataset.ganho);
+                btn.classList.toggle(classeAtiva, btnValor === valor);
+            });
+        }
+
+        // ============================================
+        //  ZERAR CALCULADORA
+        // ============================================
+        function zerarCalculadora() {
+            valorInput.value = VALOR_PADRAO;
+            freteInput.value = FRETE_PADRAO;
+            ganhoInput.value = GANHO_PADRAO;
+            cotacaoInput.value = COTACAO_PADRAO.toFixed(2);
+
+            atualizarBotoes(freteBtns, FRETE_PADRAO, 'active-frete');
+            atualizarBotoes(ganhoBtns, GANHO_PADRAO, 'active-ganho');
+
+            calcular();
+
+            const toast = document.getElementById('toast');
+            toast.textContent = '✅ Calculadora zerada!';
+            toast.classList.add('show');
+            setTimeout(() => toast.classList.remove('show'), 1500);
+        }
+
+        // ============================================
+        //  BUSCAR COTAÇÃO
+        // ============================================
+        async function buscarCotacao() {
+            const btn = document.getElementById('atualizarCotacao');
+            const toast = document.getElementById('toast');
+
+            btn.classList.add('carregando');
+            btn.textContent = '⏳';
+
+            try {
+                const response = await fetch('https://economia.awesomeapi.com.br/json/last/USD-BRL');
+                const data = await response.json();
+                const cotacao = parseFloat(data.USDBRL.bid);
+
+                if (cotacao && cotacao > 0) {
+                    cotacaoInput.value = cotacao.toFixed(2);
+
+                    localStorage.setItem('cotacaoSalva', cotacao.toFixed(2));
+                    localStorage.setItem('cotacaoData', new Date().toLocaleString('pt-BR'));
+
+                    const agora = new Date();
+                    document.getElementById('atualizadoEm').textContent =
+                        ` (${agora.toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' })})`;
+
+                    toast.textContent = '✅ Cotação atualizada!';
+                    toast.classList.add('show');
+                    setTimeout(() => toast.classList.remove('show'), 2500);
+
+                    calcular();
+                }
+            } catch (error) {
+                toast.textContent = '❌ Sem internet. Usando cotação salva.';
+                toast.classList.add('show');
+                setTimeout(() => toast.classList.remove('show'), 3000);
+            }
+
+            btn.classList.remove('carregando');
+            btn.textContent = '🔄';
+        }
+
+        // ============================================
+        //  EVENTOS DOS BOTÕES
+        // ============================================
+        freteBtns.forEach(btn => {
+            btn.addEventListener('click', function() {
+                freteInput.value = this.dataset.frete;
+                atualizarBotoes(freteBtns, parseFloat(this.dataset.frete), 'active-frete');
+                calcular();
+            });
+        });
+
+        ganhoBtns.forEach(btn => {
+            btn.addEventListener('click', function() {
+                ganhoInput.value = this.dataset.ganho;
+                atualizarBotoes(ganhoBtns, parseFloat(this.dataset.ganho), 'active-ganho');
+                calcular();
+            });
+        });
+
+        // ============================================
+        //  EVENTOS DOS INPUTS
+        // ============================================
+        freteInput.addEventListener('input', function() {
+            const valor = parseFloat(this.value.replace(',', '.')) || 0;
+            atualizarBotoes(freteBtns, valor, 'active-frete');
+            calcular();
+        });
+
+        ganhoInput.addEventListener('input', function() {
+            const valor = parseFloat(this.value.replace(',', '.')) || 0;
+            atualizarBotoes(ganhoBtns, valor, 'active-ganho');
+            calcular();
+        });
+
+        document.querySelectorAll('input').forEach(input => {
+            input.addEventListener('input', calcular);
+            input.addEventListener('keydown', function(e) {
+                if (e.key === ',') {
+                    e.preventDefault();
+                    this.value += '.';
+                }
+            });
+        });
+
+        // ============================================
+        //  BOTÃO ZERAR
+        // ============================================
+        document.getElementById('btnZerar').addEventListener('click', zerarCalculadora);
+
+        // ============================================
+        //  BOTÃO ATUALIZAR COTAÇÃO
+        // ============================================
+        document.getElementById('atualizarCotacao').addEventListener('click', buscarCotacao);
+
+        // ============================================
+        //  THEME TOGGLE
+        // ============================================
+        let darkMode = localStorage.getItem('darkMode') === 'true';
+        const themeBtn = document.getElementById('themeToggle');
+        themeBtn.textContent = darkMode ? '☀️' : '🌙';
+        if (darkMode) document.documentElement.setAttribute('data-theme', 'dark');
+
+        themeBtn.addEventListener('click', function() {
+            darkMode = !darkMode;
+            localStorage.setItem('darkMode', darkMode);
+            this.textContent = darkMode ? '☀️' : '🌙';
+            document.documentElement.setAttribute('data-theme', darkMode ? 'dark' : '');
+        });
+
+        // ============================================
+        //  INICIALIZAR
+        // ============================================
+        const cotacaoSalva = localStorage.getItem('cotacaoSalva');
+        if (cotacaoSalva) {
+            cotacaoInput.value = cotacaoSalva;
+            const dataSalva = localStorage.getItem('cotacaoData');
+            if (dataSalva) {
+                document.getElementById('atualizadoEm').textContent = ` (${dataSalva})`;
+            }
+        } else {
+            cotacaoInput.value = COTACAO_PADRAO.toFixed(2);
+        }
+
+        const freteInicial = parseFloat(freteInput.value) || FRETE_PADRAO;
+        const ganhoInicial = parseFloat(ganhoInput.value) || GANHO_PADRAO;
+        atualizarBotoes(freteBtns, freteInicial, 'active-frete');
+        atualizarBotoes(ganhoBtns, ganhoInicial, 'active-ganho');
+        calcular();
+
+        setTimeout(buscarCotacao, 600);
+    </script>
+
+</body>
+</html>

@@ -1,0 +1,16 @@
+{
+  "name": "Conversor PRO",
+  "short_name": "Conversor",
+  "description": "Calculadora profissional de conversão USD para BRL",
+  "start_url": "/Conversor-Pro/",
+  "display": "standalone",
+  "background_color": "#f0f4f8",
+  "theme_color": "#4f46e5",
+  "icons": [
+    {
+      "src": "data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>💎</text></svg>",
+      "sizes": "192x192",
+      "type": "image/svg+xml"
+    }
+  ]
+}
